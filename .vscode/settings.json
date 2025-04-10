@@ -1,0 +1,5 @@
+{
+  "python.analysis.extraPaths": [
+    "/pmirror/home/shoukun/.miniconda3/envs/segmap-qgis/share/qgis/python"
+  ]
+}
