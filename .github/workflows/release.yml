@@ -1,0 +1,118 @@
+name: Release SegMap Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Add permissions block for GitHub token
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set environment variables
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        echo "PLUGIN_NAME=segmap-qgis-plugin" >> $GITHUB_ENV
+        echo "SERVER_NAME=segmap-server" >> $GITHUB_ENV
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install qgis-plugin-ci
+      run: pip install qgis-plugin-ci
+
+    - name: Deploy plugin
+      env:
+        OSGEO_USERNAME: ${{ secrets.OSGEO_USERNAME }}
+        OSGEO_PASSWORD: ${{ secrets.OSGEO_PASSWORD }}
+      run: |
+        qgis-plugin-ci release ${GITHUB_REF/refs\/tags\//} \
+          --osgeo-username $OSGEO_USERNAME \
+          --osgeo-password $OSGEO_PASSWORD \
+
+    - name: Create plugin release artifacts
+      run: |
+        # Copy necessary plugin files
+        cp -r segmap /tmp/segmap/
+        cp LICENSE /tmp/segmap/
+
+        # Create zip and tar.gz for plugin
+        cd /tmp
+        zip -r ${{ env.PLUGIN_NAME }}.zip segmap/
+
+        # Move to workspace
+        mv ${{ env.PLUGIN_NAME }}.zip $GITHUB_WORKSPACE/
+
+    - name: Create server release artifacts
+      run: |
+        # Copy server folder
+        cp -r server /tmp/segmap-server/
+        cp LICENSE /tmp/segmap-server/
+
+        # Create zip and tar.gz for server
+        cd /tmp
+        zip -r ${{ env.SERVER_NAME }}.zip segmap-server/
+        tar -czvf ${{ env.SERVER_NAME }}.tar.gz segmap-server/
+
+        # Move to workspace
+        mv ${{ env.SERVER_NAME }}.zip $GITHUB_WORKSPACE/
+        mv ${{ env.SERVER_NAME }}.tar.gz $GITHUB_WORKSPACE/
+
+    - name: Extract metadata and changelog information
+      id: extract_info
+      run: |
+        # Extract metadata information
+        PLUGIN_VERSION=$(grep "^version=" segmap/metadata.txt | sed 's/^version=//')
+        PLUGIN_NAME=$(grep "^name=" segmap/metadata.txt | sed 's/^name=//')
+        echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_ENV
+        echo "PLUGIN_NAME_FULL=$PLUGIN_NAME" >> $GITHUB_ENV
+
+        # Extract changelog for current version using qgis-plugin-ci
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        CHANGELOG_ENTRY=$(qgis-plugin-ci changelog $TAG_VERSION)
+
+        # Create release notes with changelog
+        echo "# Release v$TAG_VERSION" > changelog_entry.md
+        echo "" >> changelog_entry.md
+
+        # Add changelog if found
+        if [ ! -z "$CHANGELOG_ENTRY" ]; then
+          echo "## Changelog" >> changelog_entry.md
+          echo "$CHANGELOG_ENTRY" >> changelog_entry.md
+          echo "" >> changelog_entry.md
+        fi
+
+        echo "## Plugin Package" >> changelog_entry.md
+        echo "- ${{ env.PLUGIN_NAME }}.zip" >> changelog_entry.md
+        echo "" >> changelog_entry.md
+        echo "## Server Package" >> changelog_entry.md
+        echo "- ${{ env.SERVER_NAME }}.zip" >> changelog_entry.md
+        echo "- ${{ env.SERVER_NAME }}.tar.gz" >> changelog_entry.md
+        echo "" >> changelog_entry.md
+        echo "For installation instructions, please refer to the project documentation." >> changelog_entry.md
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        name: ${{ env.PLUGIN_NAME_FULL }} ${{ env.PLUGIN_VERSION }}
+        draft: false
+        prerelease: false
+        files: |
+          ${{ env.PLUGIN_NAME }}.zip
+          ${{ env.SERVER_NAME }}.zip
+          ${{ env.SERVER_NAME }}.tar.gz
+        body_path: changelog_entry.md

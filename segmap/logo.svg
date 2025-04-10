@@ -1,0 +1,26 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient gradientUnits="userSpaceOnUse" id="color-3" gradientTransform="matrix(18.56716 26.66899 -.56277 6.10175 -215.589 -394.41)">
+            <stop style="stop-color:#eaeaea"/>
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="color-5">
+            <stop style="stop-color:#aac4ff"/>
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="color-6" gradientTransform="matrix(-.15916 .53459 -.74688 -.33233 -316.48 -50.885)">
+            <stop style="stop-color:#8bc34a"/>
+        </linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" id="color-9" gradientTransform="translate(5.792 6.707)">
+            <stop style="stop-color:#cbf1f5"/>
+        </linearGradient>
+    </defs>
+    <path style="fill:url(#color-3)" d="M0 0h100v100H0z"/>
+    <path style="fill:url(#color-6);transform-box:fill-box;transform-origin:50% 50%" d="M24.922 0H100v40.65H24.922z"/>
+    <path style="transform-origin:11.536px 9.453px;fill:url(#color-5)" id="object-0" d="M0 0h23.095v19.178H0z"/>
+    <path stroke-width="0" d="M66.377 64.844c5.001-.549 11.62-.346 15.158 0 2.286.223 3.086.391 4.961 1.102 2.395.909 5.865 2.636 8.269 4.41 2.298 1.697 4.239 3.573 5.925 5.926 1.8 2.51 3.605 5.935 4.41 8.819.731 2.618.824 5.346.551 7.717-.252 2.193-.855 4.198-1.929 6.064-1.13 1.963-2.946 3.847-4.823 5.374-1.922 1.564-4.159 2.782-6.615 3.859-2.648 1.161-4.749 1.755-8.82 2.756-6.297 1.549-20.815 4.57-27.009 5.237-3.83.412-5.358.571-8.269 0-3.293-.647-7.852-2.571-10.473-4.135-2.045-1.219-3.367-2.47-4.548-3.996a14.033 14.033 0 0 1-2.48-4.961c-.559-2.04-1.032-4.104-.551-6.89.663-3.845 3.375-10.361 5.787-14.332 2.145-3.531 4.864-6.36 7.58-8.682 2.503-2.14 4.684-3.644 7.993-4.961 4.013-1.598 9.87-2.757 14.883-3.307Z" style="stroke-width:2px;fill:url(#color-9)"/>
+    <path d="m24.85,-52.66l109.93,0l0,13.6l-109.93,0l0,-13.6z" fill="#fff" id="svg_4" transform="rotate(-165 69.806 -4.227)"/>
+    <path d="m7.37,-12.25l107.99,0l0,13.36l-107.99,0l0,-13.36z" fill="#fff" id="svg_5" transform="rotate(-75 72.258 53.157)"/>
+    <g transform="matrix(-.88798 -.79954 2.29339 -2.54707 49.756 52.576)" style="transform-origin:-.703125px 0">
+        <rect x="-35" y="-3.5" width="61.609" height="7" rx="3.5" ry="3.5" style="fill:#ffd60a"/>
+        <path style="fill:#4a4a4a" d="m23.586-3.5 10 3.5-10 3.5z"/>
+    </g>
+</svg>
