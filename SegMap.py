@@ -62,8 +62,8 @@ class SegMap:
     def __init__(self, iface):
         self.iface = iface
         self.canvas = iface.mapCanvas()
-        self.api_endpoint = "http://localhost:9999"
-        self.api_token = "test"
+        self.api_endpoint = "http://segmap.nodes.studio"
+        self.api_token = "1234"
         self.input_layer = None  # Raster layer for segmentation
         self.output_layer = None  # Vector layer (polygon) to store segmentation results
         self.controller = None

@@ -1,15 +1,38 @@
-# SegMap API Documentation
+# SegMap Server Documentation
 
-This document describes the RESTful API for interactive image segmentation with secure model management. The API is designed to be stateless, use bearer token authentication (OAuth2), and follow semantic versioning (`/v1` in the URL). All requests and responses use JSON format with UTC timestamps, and standard HTTP status codes are employed for error handling.
+## Running the Server
 
-## Data Structures
+To run the SegMap server, follow these steps:
+
+### 1. Build the Docker Image
+Use the provided `Dockerfile` to build the Docker image:
+```bash
+docker build -t segmap-server .
+```
+
+### 2. Run the Docker Container
+The SegMap server requires access to a folder containing model weights. This folder must be mounted to `/app/weights` inside the container. Additionally, the server uses a bearer token for authentication, which must be set using the `BEARER_TOKEN` environment variable. Since the application requires an NVIDIA GPU for deep learning, ensure that GPU resources are assigned to the container.
+
+Run the container with the following command:
+```bash
+docker run --gpus all -e BEARER_TOKEN=<your_token> -v /path/to/weights:/app/weights -p 8080:80 segmap-server
+```
+
+Replace `<your_token>` with your desired bearer token and `/path/to/weights` with the path to your local weights folder. The server will be accessible at `http://localhost:8080`.
+
+
+## API Overview
+
+This section describes the RESTful API for interactive image segmentation with secure model management. The API is designed to be stateless, use bearer token authentication (OAuth2). All requests and responses use JSON format and standard HTTP status codes are employed for error handling.
+
+### Data Structures
 
 All coordinate systems follow OpenCV's format:
 - `x` increases from left to right (horizontal coordinate).
 - `y` increases from top to bottom (vertical coordinate).
 - The coordinate system is in pixel space, which means it counts the number of pixels. Coordinates can be either float or int, but they will eventually be converted to int during processing.
 
-### 1. Polygon
+#### 1. Polygon
 Polygons are represented in GeoJSON format. Each polygon contains an exterior ring and zero or more interior rings (holes). The structure is as follows:
 - The `type` field is always `"Polygon"`.
 - The `coordinates` field is an array of arrays:
@@ -28,7 +51,7 @@ Example:
 }
 ```
 
-### 2. Clicks
+#### 2. Clicks
 Clicks are represented as an array of `[x, y, is_positive]`, where:
 - `is_positive` is `1` for positive clicks and `0` for negative clicks.
 
@@ -40,24 +63,24 @@ Example:
 ]
 ```
 
-### 3. Image
+#### 3. Image
 Images are provided as base64-encoded strings. The image format is channel-first `(C, H, W)` and must be reshaped into a 1-D array before transmission. The server will reconstruct the original shape. The image shape must match the model's input shape.
 
 ---
 
-## Endpoints
+### Endpoints
 
-### 1. Model Discovery `GET /models`
+#### 1. Model Discovery `GET /models`
 Retrieve a list of available models for segmentation.
 
-#### Request
+##### Request
 ```http
 GET /models HTTP/1.1
 Authorization: Bearer <token>
 Accept: application/json
 ```
 
-#### Response
+##### Response
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -83,10 +106,10 @@ Content-Type: application/json
 
 ---
 
-### 2. Image Segmentation `POST /segment`
+#### 2. Image Segmentation `POST /segment`
 Perform image segmentation using a specified model.
 
-#### Request
+##### Request
 ```http
 POST /segment HTTP/1.1
 Content-Type: application/json
@@ -121,7 +144,7 @@ Accept: application/json
 }
 ```
 
-#### Response
+##### Response
 ```http
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -150,7 +173,7 @@ Content-Type: application/json
 
 ---
 
-## Error Handling
+### Error Handling
 Standard error response format:
 ```json
 {

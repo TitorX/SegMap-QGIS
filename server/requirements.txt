@@ -1,4 +1,4 @@
-fastapi==0.115.12
+fastapi[standard]==0.115.12
 opencv-python==4.9.0.80
 numpy==1.26.3
 torch==2.1.2
