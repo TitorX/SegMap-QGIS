@@ -164,8 +164,6 @@ Standard error response format:
 **Common Errors:**
 | Status | Error Code           | Suggested Action                     |
 |--------|----------------------|--------------------------------------|
-| 400    | invalid_shape        | Verify image shape doesn't match     |
 | 401    | invalid_token        | Renew authentication token           |
 | 403    | model_access_denied  | Request model permissions from admin |
-| 404    | model_not_found      | Check available models via `/models` |
 | 500    | internal_error       | Retry with exponential backoff       |

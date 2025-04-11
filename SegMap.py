@@ -306,7 +306,22 @@ class SegMap:
             self.model_dropdown.setCurrentIndex(0)  # Default to the first model
             self.model_dropdown.currentIndexChanged.connect(self.update_model_selection)
             self.update_model_selection()  # Set the initial model ID
-        layout.addWidget(self.model_dropdown)
+            layout.addWidget(self.model_dropdown)
+
+        self.model_description_label = QLabel()
+        self.model_description_label.setWordWrap(True)
+        layout.addWidget(self.model_description_label)
+
+        def update_description():
+            current_index = self.model_dropdown.currentIndex()
+            if current_index >= 0:
+                model_description = models[current_index].get('description', "")
+                self.model_description_label.setText(model_description if model_description else "")
+            else:
+                self.model_description_label.setText("")
+
+        self.model_dropdown.currentIndexChanged.connect(update_description)
+        update_description()  # Initialize the description block
 
         # Add "Select Class" dropdown
         class_label = QLabel("Select Class:")
@@ -328,6 +343,9 @@ class SegMap:
         terminate_button = QPushButton("Terminate")
         terminate_button.clicked.connect(self.cleanup)
         layout.addWidget(terminate_button)
+
+        # Add spacer to push below elements to the bottom
+        layout.addStretch()
 
         # Add help section (scrollable)
         help_label = QLabel(HELP_MSG)
@@ -381,7 +399,12 @@ class SegMap:
         self.controller.add_click(feature)
 
         # trigger segmentation
-        self.controller.segment(self.model_id)
+        try:
+            self.controller.segment(self.model_id)
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                "Error", f"{str(e)}", level=Qgis.Critical
+            )
 
     def done_segmentation(self, save=True):
         """

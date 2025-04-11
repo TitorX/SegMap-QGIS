@@ -5,13 +5,18 @@ from collections import OrderedDict
 import numpy as np
 import cv2
 import torch
-from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from isegm.inference.predictors import get_predictor as build_predictor
 from isegm.inference import utils
 from isegm.inference import clicker
+
+
+DEBUG = False
 
 
 MODELS = OrderedDict(
@@ -20,7 +25,8 @@ MODELS = OrderedDict(
             "C+L ICL",
             {
                 "name": "C+L ICL",
-                "description": "ICL",
+                "description": """CFR-ICL model trained on COCO and LVIS datasets. It uses a ViT-H model as backbone.
+""",
                 "weights": "coco_lvis_icl_vit_huge.pth",
                 "input_channels": 3,
             },
@@ -29,7 +35,7 @@ MODELS = OrderedDict(
             "C+L RITM",
             {
                 "name": "C+L RITM",
-                "description": "RITM",
+                "description": "Lightning RITM model. It runs fast but is less accurate",
                 "weights": "coco_lvis_h18s_itermask.pth",
                 "input_channels": 3,
             },
@@ -234,7 +240,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-cache = {}
+bearer_token = os.getenv("BEARER_TOKEN", None)
+if bearer_token:
+    security = HTTPBearer()
+
+    @app.middleware("http")
+    async def verify_bearer_token(request, call_next):
+        if request.url.path not in ["/models"]:  # Exclude urls
+            credentials: HTTPAuthorizationCredentials = await security(request)
+            if not credentials or credentials.credentials != bearer_token:
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": "Access denied, invalid token"}
+                )
+        response = await call_next(request)
+        return response
 
 
 class ModelResponse(BaseModel):
@@ -277,65 +297,59 @@ def get_models():
 @app.post("/segment", response_model=SegmentResponse)
 @app.exception_handler(RequestValidationError)
 def segment_endpoint(request: SegmentRequest):
-    try:
-        # Parse image from base64
-        width = request.width
-        height = request.height
-        channel = request.channel
-        image = np.frombuffer(
-            base64.b64decode(request.image),
-            dtype=np.uint8
-        ).reshape((channel, height, width)).transpose((1, 2, 0))
+    # Parse image from base64
+    width = request.width
+    height = request.height
+    channel = request.channel
+    image = np.frombuffer(
+        base64.b64decode(request.image),
+        dtype=np.uint8
+    ).reshape((channel, height, width)).transpose((1, 2, 0))
 
-        if len(request.previous_mask) > 0:
-            prev_mask = polygon_to_mask(
-                request.previous_mask, width, height
-            )
-
-            prev_mask = torch.from_numpy(prev_mask)
-            prev_mask = prev_mask.unsqueeze(0).unsqueeze(0)
-        else:
-            prev_mask = None
-
-        processing_time = time.time()
-        cnts = segment(
-            request.model_id, image, request.clicks, prev_mask
+    if len(request.previous_mask) > 0:
+        prev_mask = polygon_to_mask(
+            request.previous_mask, width, height
         )
-        processing_time = time.time() - processing_time
 
-        # Debugging block to save images and clicks on segmentation map
-        if True:
-            if prev_mask is not None:
-                debug_prev_mask_path = "debug_prev_mask.png"
-                cv2.imwrite(debug_prev_mask_path, prev_mask.squeeze().cpu().numpy())
-            else:
-                # create a blank image
-                prev_mask = np.zeros((height, width), dtype=np.uint8)
-                cv2.imwrite("debug_prev_mask.png", prev_mask)
+        prev_mask = torch.from_numpy(prev_mask)
+        prev_mask = prev_mask.unsqueeze(0).unsqueeze(0)
+    else:
+        prev_mask = None
 
-            debug_image_path = "debug_image.png"
-            cv2.imwrite(debug_image_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+    processing_time = time.time()
+    cnts = segment(
+        request.model_id, image, request.clicks, prev_mask
+    )
+    processing_time = time.time() - processing_time
 
-            debug_segmentation_path = "debug_segmentation.png"
-            segmentation_mask = polygon_to_mask(cnts, width, height)
-            segmentation_mask = cv2.cvtColor(segmentation_mask, cv2.COLOR_GRAY2RGB)
+    # Debugging block to save images and clicks on segmentation map
+    if DEBUG:
+        if prev_mask is not None:
+            debug_prev_mask_path = "debug_prev_mask.png"
+            cv2.imwrite(debug_prev_mask_path, prev_mask.squeeze().cpu().numpy())
+        else:
+            # create a blank image
+            prev_mask = np.zeros((height, width), dtype=np.uint8)
+            cv2.imwrite("debug_prev_mask.png", prev_mask)
 
-            # Add clicks to the segmentation map for debugging
-            for click in request.clicks:
-                x, y, is_positive = int(click[0]), int(click[1]), int(click[2])
-                color = (0, 255, 0) if is_positive else (0, 0, 255)
-                cv2.circle(segmentation_mask, (x, y), 5, color, -1)
+        debug_image_path = "debug_image.png"
+        cv2.imwrite(debug_image_path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
-            cv2.imwrite(debug_segmentation_path, segmentation_mask)
+        debug_segmentation_path = "debug_segmentation.png"
+        segmentation_mask = polygon_to_mask(cnts, width, height)
+        segmentation_mask = cv2.cvtColor(segmentation_mask, cv2.COLOR_GRAY2RGB)
 
-        response = {
-            "segmentation": cnts,
-            "model_used": request.model_id,
-            "processing_time": processing_time,
-        }
-        return response
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"Error: {e}", flush=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        # Add clicks to the segmentation map for debugging
+        for click in request.clicks:
+            x, y, is_positive = int(click[0]), int(click[1]), int(click[2])
+            color = (0, 255, 0) if is_positive else (0, 0, 255)
+            cv2.circle(segmentation_mask, (x, y), 5, color, -1)
+
+        cv2.imwrite(debug_segmentation_path, segmentation_mask)
+
+    response = {
+        "segmentation": cnts,
+        "model_used": request.model_id,
+        "processing_time": processing_time,
+    }
+    return response
