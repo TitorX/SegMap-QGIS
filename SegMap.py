@@ -22,6 +22,7 @@ from qgis.core import (
     QgsField,
     QgsFields,
     QgsSymbol,
+    QgsMapLayer,
     QgsRendererCategory,
     QgsCategorizedSymbolRenderer
 )
@@ -165,8 +166,11 @@ class SegMap:
             )
             # Append layers to the project
             QgsProject.instance().addMapLayer(self.output_layer)
-            QgsProject.instance().addMapLayer(self.controller.segm_layer, False)
-            QgsProject.instance().addMapLayer(self.controller.click_layer, False)
+            QgsProject.instance().addMapLayer(self.controller.segm_layer)
+            QgsProject.instance().addMapLayer(self.controller.click_layer)
+
+            self.controller.segm_layer.setFlags(QgsMapLayer.Private)
+            self.controller.click_layer.setFlags(QgsMapLayer.Private)
 
         else:
             self.iface.messageBar().pushMessage(
