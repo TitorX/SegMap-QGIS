@@ -164,7 +164,7 @@ class SegMap:
                 self.canvas, self.input_layer
             )
             # Append layers to the project
-            QgsProject.instance().addMapLayer(self.input_layer)
+            QgsProject.instance().addMapLayer(self.output_layer)
             QgsProject.instance().addMapLayer(self.controller.segm_layer, False)
             QgsProject.instance().addMapLayer(self.controller.click_layer, False)
 
