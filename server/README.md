@@ -23,7 +23,7 @@ Replace `<your_token>` with your desired bearer token and `/path/to/weights` wit
 
 ## API Overview
 
-This section describes the RESTful API for interactive image segmentation with secure model management. The API is designed to be stateless, use bearer token authentication (OAuth2). All requests and responses use JSON format and standard HTTP status codes are employed for error handling.
+This section describes the RESTful API for interactive image segmentation with secure model management. The API is designed to be stateless, use bearer token authentication. All requests and responses use JSON format and standard HTTP status codes are employed for error handling.
 
 ### Data Structures
 
@@ -31,6 +31,18 @@ All coordinate systems follow OpenCV's format:
 - `x` increases from left to right (horizontal coordinate).
 - `y` increases from top to bottom (vertical coordinate).
 - The coordinate system is in pixel space, which means it counts the number of pixels. Coordinates can be either float or int, but they will eventually be converted to int during processing.
+
+```
+                  x
+   (0,0) +----------------->
+         | 
+      y  | 
+         | 
+         | 
+         v
+```
+
+This diagram follows the OpenCV coordinate system format.
 
 #### 1. Polygon
 Polygons are represented in GeoJSON format. Each polygon contains an exterior ring and zero or more interior rings (holes). The structure is as follows:
