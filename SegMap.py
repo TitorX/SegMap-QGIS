@@ -219,6 +219,9 @@ class SegMap:
             )
         )
 
+        # Listen for the Enter key to trigger the confirm button
+        self.panel.ui.confirmBtn.setShortcut(Qt.Key_Return)
+
     def check_readness(self):
         all_valid = all([
             self.panel.ui.modelSelect.currentData(),
