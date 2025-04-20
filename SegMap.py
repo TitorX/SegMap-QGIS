@@ -28,7 +28,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapToolEmitPoint
 from qgis.PyQt.QtGui import QIcon, QColor
-from PyQt5.QtCore import QMetaType
+from PyQt5.QtCore import QMetaType, pyqtSlot as Slot
 from iscontroller import ISController
 from ui.ui_ToolPanel import Ui_ToolPanel
 from ui.ui_Help import Ui_Help
@@ -60,10 +60,10 @@ class SegMap:
         self.canvas = iface.mapCanvas()
         self.settings = QgsSettings()
         self.api_endpoint: str = self.settings.value(
-            "SegMap/api_endpoint", "https://segmap.nodes.studio"
+            "SegMap/api_endpoint", "https://segmap.nodes.studio/v1"
         )
         self.api_token: str = self.settings.value(
-            "SegMap/api_token", "1234"
+            "SegMap/api_token", "demo"
         )
 
         self.controller: ISController = None
@@ -114,6 +114,7 @@ class SegMap:
         self.api_input = QLineEdit()
         token_label = QLabel("API Token:")
         self.token_input = QLineEdit()
+        self.token_input.setEchoMode(QLineEdit.Password)
 
         self.api_input.setText(self.api_endpoint)
         self.token_input.setText(self.api_token)
@@ -191,7 +192,6 @@ class SegMap:
         self.panel.ui.startBtn.clicked.connect(self.enter_segmentation)
         self.panel.ui.endBtn.clicked.connect(self.exit_segmentation)
         self.panel.ui.confirmBtn.clicked.connect(self.confirm_results)
-        self.panel.ui.terminateBtn.clicked.connect(self.deactivate_tool)
         self.panel.ui.helpBtn.clicked.connect(self.show_help_dialog)
 
         # check readiness of the tool
@@ -203,6 +203,9 @@ class SegMap:
         )
         self.panel.ui.outputSelect.currentIndexChanged.connect(
             self.check_readness
+        )
+        self.panel.ui.outputSelect.currentIndexChanged.connect(
+            self.update_class_list
         )
         self.panel.ui.classSelect.select.currentIndexChanged.connect(
             self.check_readness
@@ -230,6 +233,21 @@ class SegMap:
             # if the segmentation is already running, terminate it
             if self.map_tool:
                 self.exit_segmentation()
+
+    def update_class_list(self):
+        """When output layer is selected, read classes from it and update the class selection."""
+        output_layer_id = self.panel.ui.outputSelect.currentData()
+        if output_layer_id:
+            output_layer = QgsProject.instance().mapLayer(output_layer_id)
+            classes = set()
+            for feature in output_layer.getFeatures():
+                class_value = feature.attribute("class")
+                if class_value:
+                    classes.add(class_value)
+
+            # Update the class selection dropdown
+            self.panel.ui.classSelect.select.clear()
+            self.panel.ui.classSelect.select.addItems(sorted(classes))
 
     def enter_segmentation(self):
         """Enter the segmentation workflow."""

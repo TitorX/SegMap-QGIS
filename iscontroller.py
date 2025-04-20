@@ -1,4 +1,5 @@
 from typing import List, Dict
+import os
 import requests
 from qgis.core import (
     QgsVectorLayer,
@@ -127,7 +128,7 @@ class ISController:
 
     def get_models(self) -> List[Dict]:
         """Retrieve a list of available models for segmentation."""
-        response = requests.get(f"{self.api_url}/models", headers=self._headers())
+        response = requests.get(os.path.join(self.api_url, "models"), headers=self._headers())
         response.raise_for_status()
         return response.json()
 
@@ -165,7 +166,7 @@ class ISController:
             payload["previous_mask"] = []
 
         response = requests.post(
-            f"{self.api_url}/segment", json=payload, headers=self._headers()
+            os.path.join(self.api_url, "segment"), json=payload, headers=self._headers()
         )
         response.raise_for_status()
         result = response.json()
