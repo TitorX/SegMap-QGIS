@@ -20,7 +20,7 @@ class Ui_ToolPanel(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(ToolPanel.sizePolicy().hasHeightForWidth())
         ToolPanel.setSizePolicy(sizePolicy)
-        ToolPanel.setMinimumSize(QtCore.QSize(197, 596))
+        ToolPanel.setMinimumSize(QtCore.QSize(0, 0))
         self.content = QtWidgets.QWidget()
         self.content.setObjectName("content")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.content)
