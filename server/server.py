@@ -121,6 +121,10 @@ def mask_to_polygon(binary_mask):
         if len(polygon) < 3:
             continue  # Skip invalid polygons
 
+        # filter small polygons
+        if cv2.contourArea(contour) < 100:
+            continue
+
         # Ensure the polygon is closed
         if polygon[0] != polygon[-1]:
             polygon.append(polygon[0])
@@ -246,7 +250,7 @@ if bearer_token:
 
     @app.middleware("http")
     async def verify_bearer_token(request, call_next):
-        if request.url.path not in ["/models"]:  # Exclude urls
+        if request.url.path not in ["/v1/models"]:  # Exclude urls
             credentials: HTTPAuthorizationCredentials = await security(request)
             if not credentials or credentials.credentials != bearer_token:
                 return JSONResponse(
@@ -280,7 +284,7 @@ class SegmentResponse(BaseModel):
     processing_time: float
 
 
-@app.get("/models", response_model=list[ModelResponse])
+@app.get("/v1/models", response_model=list[ModelResponse])
 def get_models():
     models = [
         {
@@ -294,7 +298,7 @@ def get_models():
     return models
 
 
-@app.post("/segment", response_model=SegmentResponse)
+@app.post("/v1/segment", response_model=SegmentResponse)
 @app.exception_handler(RequestValidationError)
 def segment_endpoint(request: SegmentRequest):
     # Parse image from base64
