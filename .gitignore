@@ -1,3 +1,5 @@
+# Mac tmp files
+._*
 server/weights
 # Byte-compiled / optimized / DLL files
 __pycache__/

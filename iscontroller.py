@@ -15,7 +15,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsProject,
 )
-from qgis.gui import QgsMapCanvas
+from qgis.utils import iface
 from PyQt5.QtCore import QMetaType
 from helper_func import (
     read_displayed_raster_data, encode_image,
@@ -70,14 +70,11 @@ class ISController:
         self,
         api_url: str,
         token: str,
-        canvas: QgsMapCanvas,
-        raster_layer: QgsRasterLayer,
     ):
         self.api_url = api_url
         self.token = token
         self.current_model = None
-        self.canvas = canvas
-        self.raster_layer = raster_layer
+        self.canvas = iface.mapCanvas()
 
         # Set up the style for the clicks layer,
         # use point symbol with colors depending on click type
@@ -140,10 +137,11 @@ class ISController:
         self.click_layer.updateExtents()
         self.click_layer.triggerRepaint()
 
-    def segment(self, model_id) -> Dict:
+    def segment(self, model_id, raster_layer) -> Dict:
         """Perform image segmentation using the current model and manage clicks/mask."""
+
         # Read image data from the current canvas
-        image = read_displayed_raster_data(self.raster_layer, self.canvas)
+        image = read_displayed_raster_data(raster_layer, self.canvas)
         base64_image = encode_image(image)
 
         # Collect clicks from the click layer
@@ -295,3 +293,4 @@ class ISController:
         """Remove layers from the QGIS project."""
         QgsProject.instance().removeMapLayer(self.click_layer.id())
         QgsProject.instance().removeMapLayer(self.segm_layer.id())
+        iface.mapCanvas().refresh()
