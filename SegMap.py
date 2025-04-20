@@ -205,7 +205,7 @@ class SegMap:
             self.check_readness
         )
         self.panel.ui.outputSelect.currentIndexChanged.connect(
-            self.update_class_list
+            self.on_class_select_changed
         )
         self.panel.ui.classSelect.select.currentIndexChanged.connect(
             self.check_readness
@@ -234,7 +234,7 @@ class SegMap:
             if self.map_tool:
                 self.exit_segmentation()
 
-    def update_class_list(self):
+    def on_class_select_changed(self):
         """When output layer is selected, read classes from it and update the class selection."""
         output_layer_id = self.panel.ui.outputSelect.currentData()
         if output_layer_id:

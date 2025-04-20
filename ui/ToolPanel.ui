@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>0</width>
-    <height>0</height>
+    <width>197</width>
+    <height>596</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -199,8 +199,18 @@ p, li { white-space: pre-wrap; }
      </widget>
     </item>
     <item>
+     <widget class="QPushButton" name="confirmBtn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Confirm↵</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="QPushButton" name="redoBtn">
         <property name="enabled">
          <bool>false</bool>
@@ -210,7 +220,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QPushButton" name="undoBtn">
         <property name="enabled">
          <bool>false</bool>
@@ -220,39 +230,12 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="confirmBtn">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Confirm↵</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="discardBtn">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Discard</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
      <widget class="QPushButton" name="endBtn">
       <property name="text">
        <string>End</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="terminateBtn">
-      <property name="text">
-       <string>Terminate</string>
       </property>
      </widget>
     </item>
