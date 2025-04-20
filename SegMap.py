@@ -1,5 +1,4 @@
 import os
-import random
 from qgis.PyQt.QtWidgets import (
     QAction,
     QDialog,
@@ -7,28 +6,22 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
-    QComboBox,
     QDockWidget,
 )
 from qgis.PyQt.QtCore import Qt
 from qgis.core import (
     Qgis,
     QgsProject,
-    QgsVectorLayer,
     QgsFeature,
     QgsGeometry,
-    QgsRasterLayer,
     QgsField,
     QgsFields,
-    QgsSymbol,
     QgsMapLayer,
-    QgsRendererCategory,
-    QgsCategorizedSymbolRenderer,
     QgsSettings
 )
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.PyQt.QtGui import QIcon, QColor
-from PyQt5.QtCore import QMetaType, pyqtSlot as Slot
+from qgis.PyQt.QtGui import QIcon
+from PyQt5.QtCore import QMetaType
 from iscontroller import ISController
 from ui.ui_ToolPanel import Ui_ToolPanel
 from ui.ui_Help import Ui_Help
@@ -73,14 +66,17 @@ class SegMap:
 
     def initGui(self):
         """Create the GUI elements."""
-        self.settings_action = QAction("Settings", self.iface.mainWindow())
-        self.start_action = QAction("Start", self.iface.mainWindow())
+        self.settings_action = QAction("SegMap: Settings", self.iface.mainWindow())
+        self.start_action = QAction("SegMap: Start", self.iface.mainWindow())
 
         # Set icons for the actions
         self.settings_action.setIcon(
-            QIcon(get_resource_path("icons/settings_icon.png"))
+            QIcon(":images/themes/default/mActionMapSettings.svg")
         )
-        self.start_action.setIcon(QIcon(get_resource_path("icons/start_icon.png")))
+
+        self.start_action.setIcon(QIcon(
+            get_resource_path('icons/logo.png')
+        ))
 
         self.settings_action.triggered.connect(self.show_settings_dialog)
         self.start_action.triggered.connect(self.activate_tool)

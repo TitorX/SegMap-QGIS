@@ -3,7 +3,6 @@ import os
 import requests
 from qgis.core import (
     QgsVectorLayer,
-    QgsRasterLayer,
     QgsField,
     QgsFillSymbol,
     QgsCategorizedSymbolRenderer,
