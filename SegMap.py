@@ -53,7 +53,7 @@ class SegMap:
         self.canvas = iface.mapCanvas()
         self.settings = QgsSettings()
         self.api_endpoint: str = self.settings.value(
-            "SegMap/api_endpoint", "https://segmap.nodes.studio/v1"
+            "SegMap/api_endpoint", "https://segmap.nodes.studio"
         )
         self.api_token: str = self.settings.value(
             "SegMap/api_token", "demo"

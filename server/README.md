@@ -20,6 +20,8 @@ docker run --gpus all -e BEARER_TOKEN=<your_token> -v /path/to/weights:/app/weig
 
 Replace `<your_token>` with your desired bearer token and `/path/to/weights` with the path to your local weights folder. The server will be accessible at `http://localhost:8080`.
 
+### 3. Accessing the Server from QGIS-plugin
+To access the SegMap server from the QGIS plugin, ensure that the plugin is configured to point to the server's URL (e.g., `http://localhost:8080`) and has `BEARER_TOKEN` set.
 
 ## API Overview
 
@@ -82,7 +84,7 @@ Images are provided as base64-encoded strings. The image format is channel-first
 
 ### Endpoints
 
-#### 1. Model Discovery `GET /models`
+#### 1. Model Discovery `GET /v1/models`
 Retrieve a list of available models for segmentation.
 
 ##### Request
@@ -118,7 +120,7 @@ Content-Type: application/json
 
 ---
 
-#### 2. Image Segmentation `POST /segment`
+#### 2. Image Segmentation `POST /v1/segment`
 Perform image segmentation using a specified model.
 
 ##### Request
