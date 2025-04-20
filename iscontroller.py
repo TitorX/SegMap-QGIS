@@ -21,6 +21,7 @@ from PyQt5.QtCore import QMetaType
 from helper_func import (
     read_displayed_raster_data, encode_image,
 )
+from collections import deque
 
 
 class ISController:
@@ -119,6 +120,9 @@ class ISController:
         )
         self.segm_layer.renderer().setSymbol(segm_symbol)
 
+        self.undo_stack = deque()  # Store previous states for undo
+        self.redo_stack = deque()  # Store undone states for redo
+
     def _headers(self):
         return {
             "Authorization": f"Bearer {self.token}",
@@ -138,8 +142,14 @@ class ISController:
         self.click_layer.updateExtents()
         self.click_layer.triggerRepaint()
 
-    def segment(self, model_id, raster_layer) -> Dict:
+    def segment(self, model_id, raster_layer, new_click: QgsFeature = None) -> Dict:
         """Perform image segmentation using the current model and manage clicks/mask."""
+        self._save_state_for_undo()  # Save current state before modification
+        self.redo_stack.clear()  # Clear redo stack on new action
+
+        if new_click:
+            # Add the new click to the click layer
+            self.add_click(new_click)
 
         # Read image data from the current canvas
         image = read_displayed_raster_data(raster_layer, self.canvas)
@@ -289,6 +299,58 @@ class ISController:
             geo_x, geo_y = point.x(), point.y()
 
         return [geo_x, geo_y]
+
+    def _save_state_for_undo(self):
+        """Save the current state of the click and segmentation layers for undo."""
+        state = {
+            "click_layer": [feature for feature in self.click_layer.getFeatures()],
+            "segm_layer": [feature for feature in self.segm_layer.getFeatures()],
+        }
+        self.undo_stack.append(state)
+
+    def _restore_state(self, state):
+        """Restore the state of the click and segmentation layers."""
+        self.click_layer.dataProvider().truncate()
+        self.segm_layer.dataProvider().truncate()
+
+        for feature in state["click_layer"]:
+            self.click_layer.dataProvider().addFeature(feature)
+
+        for feature in state["segm_layer"]:
+            self.segm_layer.dataProvider().addFeature(feature)
+
+        self.click_layer.updateExtents()
+        self.click_layer.triggerRepaint()
+        self.segm_layer.updateExtents()
+        self.segm_layer.triggerRepaint()
+
+    def undo(self):
+        """Undo the last action."""
+        if not self.undo_stack:
+            return  # Nothing to undo
+
+        current_state = {
+            "click_layer": [feature for feature in self.click_layer.getFeatures()],
+            "segm_layer": [feature for feature in self.segm_layer.getFeatures()],
+        }
+        self.redo_stack.append(current_state)  # Save current state for redo
+
+        previous_state = self.undo_stack.pop()
+        self._restore_state(previous_state)
+
+    def redo(self):
+        """Redo the last undone action."""
+        if not self.redo_stack:
+            return  # Nothing to redo
+
+        current_state = {
+            "click_layer": [feature for feature in self.click_layer.getFeatures()],
+            "segm_layer": [feature for feature in self.segm_layer.getFeatures()],
+        }
+        self.undo_stack.append(current_state)  # Save current state for undo
+
+        next_state = self.redo_stack.pop()
+        self._restore_state(next_state)
 
     def teardown(self):
         """Remove layers from the QGIS project."""

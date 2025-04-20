@@ -276,6 +276,10 @@ class SegMap:
         self.panel.ui.redoBtn.setEnabled(True)  # Enable "Redo" button
         self.panel.ui.confirmBtn.setEnabled(True)  # Enable "Confirm" button
 
+        # Connect redo and undo actions
+        self.panel.ui.undoBtn.clicked.connect(self.controller.undo)
+        self.panel.ui.redoBtn.clicked.connect(self.controller.redo)
+
     def segment(self, point, button):
         """Handle clicks on the map canvas to segment the raster layer."""
         if not self.api_endpoint or not self.api_token:
@@ -288,13 +292,12 @@ class SegMap:
         feature = QgsFeature()
         feature.setGeometry(QgsGeometry.fromPointXY(point))
         feature.setAttributes([1 if button == Qt.LeftButton else 0])
-        self.controller.add_click(feature)
 
         # trigger segmentation
         try:
             raster_layer_id = self.panel.ui.rasterSelect.currentData()
             raster_layer = QgsProject.instance().mapLayer(raster_layer_id)
-            self.controller.segment(self.model_id, raster_layer)
+            self.controller.segment(self.model_id, raster_layer, feature)
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 "Error", f"{str(e)}", level=Qgis.Critical
