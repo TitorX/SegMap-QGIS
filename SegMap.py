@@ -184,7 +184,9 @@ class SegMap:
         self.panel.show()
 
         # Update state of buttons
-        self.panel.ui.endBtn.hide()  # Hide "End" button
+        for button in self.panel.ui.actionBtnGroup.buttons():
+            button.setEnabled(False)
+            button.hide()
         self.settings_action.setEnabled(False)  # Disable "Settings" button
         self.start_action.setEnabled(False)  # Disable "Start" button
 
@@ -219,8 +221,12 @@ class SegMap:
             )
         )
 
-        # Listen for the Enter key to trigger the confirm button
+        # Bind shortcuts to buttons
+        self.panel.ui.startBtn.setShortcut(Qt.Key_Return)
         self.panel.ui.confirmBtn.setShortcut(Qt.Key_Return)
+        self.panel.ui.undoBtn.setShortcut(Qt.Key_Left)
+        self.panel.ui.redoBtn.setShortcut(Qt.Key_Right)
+        self.panel.ui.endBtn.setShortcut(Qt.Key_Escape)
 
     def check_readness(self):
         all_valid = all([
@@ -270,11 +276,10 @@ class SegMap:
         self.panel.ui.rasterSelect.setEnabled(False)  # Disable raster layer selection
         self.panel.ui.outputSelect.setEnabled(False)  # Disable output layer selection
 
-        # Enable buttons
-        self.panel.ui.endBtn.show()  # Show "End" button
-        self.panel.ui.undoBtn.setEnabled(True)  # Enable "Undo" button
-        self.panel.ui.redoBtn.setEnabled(True)  # Enable "Redo" button
-        self.panel.ui.confirmBtn.setEnabled(True)  # Enable "Confirm" button
+        # Show and enable all buttons from action group
+        for btn in self.panel.ui.actionBtnGroup.buttons():
+            btn.setEnabled(True)
+            btn.show()
 
         # Connect redo and undo actions
         self.panel.ui.undoBtn.clicked.connect(self.controller.undo)
@@ -354,10 +359,9 @@ class SegMap:
         self.init_controller()
 
         # Disable buttons
-        self.panel.ui.undoBtn.setEnabled(False)
-        self.panel.ui.redoBtn.setEnabled(False)
-        self.panel.ui.confirmBtn.setEnabled(False)
-        self.panel.ui.endBtn.hide()
+        for button in self.panel.ui.actionBtnGroup.buttons():
+            button.setEnabled(False)
+            button.hide()
 
         # Enable buttons
         self.panel.ui.startBtn.show()
