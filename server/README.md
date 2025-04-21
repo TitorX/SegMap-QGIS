@@ -23,6 +23,44 @@ Replace `<your_token>` with your desired bearer token and `/path/to/weights` wit
 ### 3. Accessing the Server from QGIS-plugin
 To access the SegMap server from the QGIS plugin, ensure that the plugin is configured to point to the server's URL (e.g., `http://localhost:8080`) and has `BEARER_TOKEN` set.
 
+### 4. Preparing the Weights Folder
+
+The SegMap server requires a folder containing model weights and a `models.yaml` file to function correctly. This folder must be mounted to `/app/weights` inside the Docker container during runtime.
+
+#### Folder Structure
+Ensure your weights folder is structured as follows:
+```
+weights/
+├── models.yaml
+├── coco_lvis_icl_vit_huge.pth
+```
+
+- `models.yaml`: A YAML file that defines the available models and their corresponding weights.
+- `*.pth` : Weight files for the models.
+
+#### `models.yaml` Format
+The `models.yaml` file specifies the models available for segmentation. Each model entry includes:
+- `name`: The name of the model.
+- `input_channels`: The number of input channels the model expects.
+- `description`: A brief description of the model.
+- `weights`: The filename of the model's weight file.
+
+Example:
+```yaml
+CFR-ICL:
+  name: "CFR-ICL"
+  input_channels: 3
+  description: "A model for general-purpose segmentation tasks. Use ViT-H backbone"
+  weights: "coco_lvis_icl_vit_huge.pth"
+```
+
+#### Downloading the Weights
+You can download the required weights from the following repositories:
+- [CFR-ICL](https://github.com/TitorX/CFR-ICL-Interactive-Segmentation)
+- [RITM](https://github.com/SamsungLabs/ritm_interactive_segmentation)
+
+After downloading, place the weight files and `models.yaml` in the `weights/` folder as shown above.
+
 ## API Overview
 
 This section describes the RESTful API for interactive image segmentation with secure model management. The API is designed to be stateless, use bearer token authentication. All requests and responses use JSON format and standard HTTP status codes are employed for error handling.

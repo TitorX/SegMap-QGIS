@@ -14,24 +14,20 @@ from pydantic import BaseModel
 from isegm.inference.predictors import get_predictor as build_predictor
 from isegm.inference import utils
 from isegm.inference import clicker
+import yaml
 
 
 DEBUG = False
 
 
-MODELS = OrderedDict(
-    [
-        (
-            "CFR-ICL",
-            {
-                "name": "CFR-ICL",
-                "description": """ViT-H backbone.""",
-                "weights": "coco_lvis_icl_vit_huge.pth",
-                "input_channels": 3,
-            },
-        ),
-    ]
-)
+MODELS = OrderedDict()
+
+# Load model information from YAML file
+with open(os.path.join("weights", "models.yaml"), "r") as yaml_file:
+    models_yaml = yaml.safe_load(yaml_file)
+    for model_name, model_info in models_yaml.items():
+        MODELS[model_name] = model_info
+
 DEVICE = "cuda"
 PREDICTOR_POOL_CACHE_SIZE = 5
 PREDICTOR_POOL = OrderedDict()
