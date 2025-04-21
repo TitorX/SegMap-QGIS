@@ -1,7 +1,15 @@
 # SegMap
 
-<div align="center">
-  <img src="icons/logo.svg" alt="SegMap Logo">
+<div align="center" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+  <div style="display: inline-block; text-align: center;">
+    <div>"SegMap"</div>
+    <img src="icons/logo.svg" alt="SegMap Logo" style="display: inline-block; height: 100px;">
+  </div>
+  <span style="font-size: 50px; margin: 0 10px;">+</span>
+  <div style="display: inline-block; text-align: center;">
+    <div>"QGIS"</div>
+    <img src="https://qgis.org/img/logosign.svg" alt="QGIS Logo" style="display: inline-block; height: 100px;">
+  </div>
 </div>
 
 ## Introduction
