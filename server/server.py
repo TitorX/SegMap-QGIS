@@ -22,25 +22,14 @@ DEBUG = False
 MODELS = OrderedDict(
     [
         (
-            "C+L ICL",
+            "CFR-ICL",
             {
-                "name": "C+L ICL",
-                "description": """CFR-ICL model trained on COCO and LVIS datasets. It uses a ViT-H model as backbone.
-""",
+                "name": "CFR-ICL",
+                "description": """ViT-H backbone.""",
                 "weights": "coco_lvis_icl_vit_huge.pth",
                 "input_channels": 3,
             },
         ),
-        (
-            "C+L RITM",
-            {
-                "name": "C+L RITM",
-                "description": "Lightning RITM model. It runs fast but is less accurate",
-                "weights": "coco_lvis_h18s_itermask.pth",
-                "input_channels": 3,
-            },
-        ),
-
     ]
 )
 DEVICE = "cuda"

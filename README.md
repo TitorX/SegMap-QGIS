@@ -22,6 +22,10 @@ SegMap is a **QGIS plugin** that leverages deep learning (DL) models to enable f
 
 By merging AI efficiency with user-friendly interaction, SegMap revolutionizes tasks like land cover mapping, infrastructure monitoring, and environmental analysis.
 
+## Supported QGIS Version
+
+The supported and tested QGIS version for SegMap is **QGIS 3.40-Bratislava LTR**. Other versions of QGIS have not been tested and may not work as expected.
+
 ## Installation
 
 To install SegMap as a QGIS plugin, follow these steps:
@@ -75,3 +79,43 @@ e. Once finished, click the **End** button to exit the tool usage.
 ## Self-Hosted API Server
 
 If you prefer to deploy the API server on your own device, please refer to the [server/README.md](server/README.md) for detailed instructions.
+
+## License
+
+This plugin is licensed under the MIT License. You can find the full license text in the [LICENSE](LICENSE) file.
+
+## Authors and References
+
+### Authors
+
+- **Shoukun Sun**
+- **Zhe Wang**
+
+### References
+
+If you use this plugin in your work, please cite the following papers:
+
+```
+@article{cfr_icl_2024,
+      title={CFR-ICL: Cascade-Forward Refinement with Iterative Click Loss for Interactive Image Segmentation},
+      volume={38},
+      url={https://ojs.aaai.org/index.php/AAAI/article/view/28306},
+      DOI={10.1609/aaai.v38i5.28306},
+      number={5},
+      journal={Proceedings of the AAAI Conference on Artificial Intelligence},
+      author={Sun, Shoukun and Xian, Min and Xu, Fei and Capriotti, Luca and Yao, Tiankai},
+      year={2024},
+      month={Mar.},
+      pages={5017-5024}
+}
+
+@misc{is_aerial_2024,
+      title={Interactive segmentation in aerial images: a new benchmark and an open access web-based tool}, 
+      author={Zhe Wang and Shoukun Sun and Xiang Que and Xiaogang Ma},
+      year={2024},
+      eprint={2308.13174},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2308.13174}, 
+}
+```
