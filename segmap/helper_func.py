@@ -1,3 +1,4 @@
+import os
 import base64
 from PyQt5.QtGui import QImage
 import numpy as np
@@ -18,12 +19,20 @@ def qimage_to_numpy_rgb(image: QImage) -> np.ndarray:
     image = image.convertToFormat(QImage.Format_RGB888)
 
     # Save QImage to a temporary file
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp_file:
-        image.save(tmp_file.name)
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_file:
+        temp_filename = tmp_file.name
 
-        # Load the temporary file into a NumPy array using PIL
-        pil_image = Image.open(tmp_file.name)
-        array = np.array(pil_image)
+    image.save(tmp_file.name)
+
+    # Load the temporary file into a NumPy array using PIL
+    pil_image = Image.open(tmp_file.name)
+    array = np.array(pil_image)
+
+    # Delete the temporary file
+    try:
+        os.remove(temp_filename)
+    except OSError:
+        pass
 
     return array
 
