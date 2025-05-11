@@ -5,7 +5,7 @@ description=AI-powered interactive image segmentation for rapid map digitization
 about=SegMap using deep learning to extract vector features from imagery with just a few clicks, reducing traditional digitization effort by 90%%. Ideal for rapid land cover mapping and environmental analysis.
 tracker=https://github.com/TitorX/SegMap-QGIS/issues
 repository=https://github.com/TitorX/SegMap-QGIS
-version=1.0.5
+version=1.0.6
 author=Shoukun Sun, Zhe Wang
 email=titor.sun@gmail.com
 # End of mandatory metadata

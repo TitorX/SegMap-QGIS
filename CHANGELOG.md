@@ -5,6 +5,10 @@ All notable changes to SegMap will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.6 - 2025/05/11
+
+- Fix temp file permission issue on Windows.
+
 ## 1.0.5 - 2025/04/30
 
 - Config changelog message.
